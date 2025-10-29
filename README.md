@@ -5,7 +5,7 @@ This service regularly sends ARP packets (Gratuitous ARP) for configured IP addr
 ## Quick Install
 
 ```bash
-git clone https://github.com/noxomix/ArpRoutingAgent.git && cd ArpRoutingAgent && sudo ./install.sh
+git clone https://github.com/noxomix/ArpRoutingAgent.git && cd ArpRoutingAgent && sudo ./install.sh && cd ..
 ```
 
 ## How it works
