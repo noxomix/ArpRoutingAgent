@@ -1,0 +1,5 @@
+{
+  "interface": "vmbr0",
+  "interval": 60,
+  "ips": []
+}

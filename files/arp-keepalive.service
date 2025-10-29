@@ -1,0 +1,19 @@
+[Unit]
+Description=ARP Keepalive Service for Proxmox Routed IPs
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/arp-keepalive.sh
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Sicherheits-Optionen
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
