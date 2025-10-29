@@ -35,14 +35,36 @@ log_info "Starting installation of ARP Keepalive Service..."
 # Check and install dependencies
 log_info "Checking dependencies..."
 
+NEEDS_UPDATE=false
 if ! command -v jq &> /dev/null; then
-    log_warn "jq is not installed. Installing jq..."
-    apt-get update && apt-get install -y jq
+    log_warn "jq is not installed."
+    NEEDS_UPDATE=true
 fi
 
 if ! command -v arping &> /dev/null; then
-    log_warn "arping is not installed. Installing arping..."
-    apt-get update && apt-get install -y arping
+    log_warn "arping is not installed."
+    NEEDS_UPDATE=true
+fi
+
+if [ "$NEEDS_UPDATE" = true ]; then
+    log_info "Installing missing dependencies..."
+    # Update package list, ignore errors from enterprise repos
+    apt-get update 2>&1 | grep -v "enterprise.proxmox.com" || true
+
+    # Install packages individually
+    if ! command -v jq &> /dev/null; then
+        apt-get install -y jq || {
+            log_error "Failed to install jq"
+            exit 1
+        }
+    fi
+
+    if ! command -v arping &> /dev/null; then
+        apt-get install -y arping || apt-get install -y iputils-arping || {
+            log_error "Failed to install arping"
+            exit 1
+        }
+    fi
 fi
 
 log_info "All dependencies are installed"
