@@ -67,8 +67,8 @@ while true; do
     if [[ ${#IPS[@]} -gt 0 ]]; then
         for ip in "${IPS[@]}"; do
             if [[ -n "$ip" ]]; then
-                arping -U -c 1 -I "$IFACE" "$ip" >/dev/null 2>&1 || \
-                    log "WARNING: arping failed for $ip"
+                # Gratuitous ARP (-U) doesn't expect replies, so we ignore exit codes
+                arping -U -c 1 -I "$IFACE" "$ip" >/dev/null 2>&1
             fi
         done
         log "ARP pings sent for ${#IPS[@]} IP(s)"
