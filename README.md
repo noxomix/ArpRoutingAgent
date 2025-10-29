@@ -2,6 +2,12 @@
 
 This service regularly sends ARP packets (Gratuitous ARP) for configured IP addresses to keep routed IPs active with hosting providers.
 
+## Quick Install
+
+```bash
+git clone https://github.com/noxomix/ArpRoutingAgent.git && cd ArpRoutingAgent && sudo ./install.sh
+```
+
 ## How it works
 
 The service reads a JSON configuration file and sends ARP pings at a configurable interval for all specified IP addresses via the specified network interface.
