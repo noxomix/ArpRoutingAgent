@@ -166,8 +166,12 @@ echo ""
 # Output status
 systemctl status arp-keepalive --no-pager
 
-# Schedule cleanup of installation directory
+# Change to parent directory before cleanup
 INSTALL_DIR="$SCRIPT_DIR"
+PARENT_DIR="$(dirname "$INSTALL_DIR")"
+cd "$PARENT_DIR"
+
+# Schedule cleanup of installation directory
 log_info "Scheduling cleanup of installation directory: $INSTALL_DIR"
 cat > /tmp/cleanup-arp-install.sh <<EOF
 #!/bin/bash
