@@ -54,6 +54,15 @@ if [[ ! -d "$CONFIG_DIR" ]]; then
     mkdir -p "$CONFIG_DIR"
 fi
 
+# Check if service already exists and stop it
+SERVICE_NAME="arp-keepalive.service"
+if systemctl list-unit-files | grep -q "^$SERVICE_NAME"; then
+    log_info "Existing service found. Stopping and disabling old service..."
+    systemctl stop "$SERVICE_NAME" 2>/dev/null || true
+    systemctl disable "$SERVICE_NAME" 2>/dev/null || true
+    log_info "Old service stopped and disabled"
+fi
+
 # Create configuration file (if not present)
 CONFIG_FILE="$CONFIG_DIR/config.json"
 if [[ ! -f "$CONFIG_FILE" ]]; then
@@ -68,7 +77,7 @@ EOF
     log_warn "Configuration file created with default values"
     log_warn "Please edit: $CONFIG_FILE"
 else
-    log_info "Configuration file already exists: $CONFIG_FILE"
+    log_info "Configuration file already exists: $CONFIG_FILE (keeping existing config)"
 fi
 
 # Copy script
@@ -112,6 +121,7 @@ if systemctl start arp-keepalive.service; then
     log_info "Service started successfully"
 else
     log_error "Service could not be started"
+    log_error "Check logs with: journalctl -u arp-keepalive -n 50"
     exit 1
 fi
 
@@ -133,3 +143,16 @@ echo ""
 
 # Output status
 systemctl status arp-keepalive --no-pager
+
+# Schedule cleanup of installation directory
+INSTALL_DIR="$SCRIPT_DIR"
+log_info "Scheduling cleanup of installation directory: $INSTALL_DIR"
+cat > /tmp/cleanup-arp-install.sh <<EOF
+#!/bin/bash
+sleep 3
+rm -rf "$INSTALL_DIR"
+rm -f /tmp/cleanup-arp-install.sh
+EOF
+chmod +x /tmp/cleanup-arp-install.sh
+nohup /tmp/cleanup-arp-install.sh >/dev/null 2>&1 &
+log_info "Installation directory will be removed in 3 seconds..."
